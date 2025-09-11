@@ -28,3 +28,5 @@ data.json
 
 # Logs
 *.log
+
+.kilocode/mcp.json

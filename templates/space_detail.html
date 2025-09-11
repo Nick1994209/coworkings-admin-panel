@@ -33,10 +33,21 @@
                     {% endif %}
                 </p>
             </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6">
+       </div>
+   </div>
+   
+   <div class="col-md-6">
+       <div class="card">
+           <div class="card-header">
+               <h5>Location Map</h5>
+           </div>
+           <div class="card-body">
+               <div id="map" style="width: 100%; height: 300px;"></div>
+           </div>
+       </div>
+   </div>
+   
+   <div class="col-md-6">
         <div class="card">
             <div class="card-header">
                 <h5>Update Occupancy</h5>
@@ -117,4 +128,66 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+   // Initialize the map after the page loads
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Функция для поиска координат по адресу через Nominatim API
+        async function getCoordinatesByAddress(address) {
+            console.info("aaaa", address)
+            const encodedAddress = encodeURIComponent(address);
+            // Используем публичный Nominatim API без ключа
+            const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}`;
+
+            try {
+                // Важно: Nominatim требует указания User-Agent или Referer в заголовках.
+                // Для простоты примера в браузере можно использовать 'fetch', но лучше указать заголовок.
+                const response = await fetch(nominatimUrl, {
+                    headers: {
+                        'User-Agent': 'MyGeocodingApp/1.0' // Замените на название вашего приложения
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Проверяем, есть ли результаты
+                if (data && data.length > 0) {
+                    // Получаем координаты первого результата (формат: строка)
+                    const latitude = parseFloat(data[0].lat);
+                    const longitude = parseFloat(data[0].lon);
+                    return [latitude, longitude]; // Возвращаем [широта, долгота]
+                } else {
+                    throw new Error('Адрес не найден');
+                }
+            } catch (error) {
+                console.error('Ошибка при геокодировании через Nominatim:', error);
+                throw error;
+            }
+        }
+
+        // Get the location from the template context
+        var locationAddress = "{{ space.location }}";
+        const coords = await getCoordinatesByAddress(locationAddress);
+        // Создаем метку
+        const placemark = new ymaps.Placemark(coords);
+
+        myMap = new ymaps.Map("map", {
+            center: coords, // Начальное положение (Москва)
+            zoom: 10,
+            controls: ['zoomControl', 'fullscreenControl']
+        });
+        // Добавляем метку на карту
+        myMap.geoObjects.add(placemark);
+
+        // Центрируем карту на найденной метке
+        myMap.setCenter(coords, 16);
+
+        // Открываем балун с адресом
+        placemark.balloon.open();
+   });
+</script>
 {% endblock %}
