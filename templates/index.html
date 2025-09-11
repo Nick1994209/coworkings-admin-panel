@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Coworking Admin Panel{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1>Dashboard</h1>
+        <p>Welcome to the Coworking Space Administration Panel</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Manage Spaces</h5>
+                <p class="card-text">View, add, edit, and delete coworking spaces.</p>
+                <a href="{{ url_for('spaces') }}" class="btn btn-primary">Go to Spaces</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Registration Forms</h5>
+                <p class="card-text">View and manage registration forms.</p>
+                <a href="{{ url_for('registration_form') }}" class="btn btn-primary">View Forms</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                {% if spaces %}
+                    <p>Total Spaces: {{ spaces|length }}</p>
+                    <p>Overall Occupancy: 
+                        {% set total_capacity = 0 %}
+                        {% set total_occupancy = 0 %}
+                        {% for space in spaces.values() %}
+                            {% set total_capacity = total_capacity + space.capacity %}
+                            {% set total_occupancy = total_occupancy + space.current_occupancy %}
+                        {% endfor %}
+                        {% if total_capacity > 0 %}
+                            {{ "%.1f"|format((total_occupancy / total_capacity * 100)) }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </p>
+                {% else %}
+                    <p>No spaces available. <a href="{{ url_for('add_space') }}">Add your first space</a>.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

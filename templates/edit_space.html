@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Space - Coworking Admin Panel{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>Edit Coworking Space</h1>
+            <a href="{{ url_for('space_detail', space_id=space_id) }}" class="btn btn-secondary">Back to Details</a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Space Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ space.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" value="{{ space.location }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="capacity" class="form-label">Capacity</label>
+                        <input type="number" class="form-control" id="capacity" name="capacity" min="1" value="{{ space.capacity }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Space</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

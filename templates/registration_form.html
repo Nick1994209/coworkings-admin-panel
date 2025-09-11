@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Registration Form - Coworking Admin Panel{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>Registration Form</h1>
+            <a href="{{ url_for('registrations') }}" class="btn btn-secondary">View Submissions</a>
+        </div>
+        <p>This page shows a sample registration form for users to request a spot at a coworking space.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>User Registration Form</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('submit_registration') }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" name="phone">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="company" class="form-label">Company/Organization</label>
+                        <input type="text" class="form-control" id="company" name="company">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="space" class="form-label">Preferred Coworking Space</label>
+                        <select class="form-select" id="space" name="space" required>
+                            <option value="">Select a space</option>
+                            {% for space_id, space in spaces.items() %}
+                            <option value="{{ space_id }}">{{ space.name }} ({{ space.location }})</option>
+                            {% endfor %}
+                            {% if not spaces %}
+                            <option value="">No spaces available</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="membershipType" class="form-label">Membership Type</label>
+                        <select class="form-select" id="membershipType" name="membershipType" required>
+                            <option value="">Select membership type</option>
+                            <option value="daily">Daily Pass</option>
+                            <option value="monthly">Monthly Membership</option>
+                            <option value="annual">Annual Membership</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate" name="startDate" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="additionalInfo" class="form-label">Additional Information</label>
+                        <textarea class="form-control" id="additionalInfo" name="additionalInfo" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="terms" required>
+                        <label class="form-check-label" for="terms">
+                            I agree to the terms and conditions
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Submit Registration</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Form Instructions</h5>
+            </div>
+            <div class="card-body">
+                <p>Users can fill out this form to request a spot at one of your coworking spaces.</p>
+                <p>As an administrator, you can:</p>
+                <ul>
+                    <li>Review submitted forms</li>
+                    <li>Approve or reject requests</li>
+                    <li>Track membership types</li>
+                    <li>Monitor space utilization</li>
+                </ul>
+                <p>Submitted forms are stored in the system for review.</p>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Available Spaces</h5>
+            </div>
+            <div class="card-body">
+                {% if spaces %}
+                <ul class="list-group">
+                    {% for space_id, space in spaces.items() %}
+                    <li class="list-group-item">
+                        <strong>{{ space.name }}</strong><br>
+                        <small>{{ space.location }}</small><br>
+                        <small>Capacity: {{ space.capacity }} | Current: {{ space.current_occupancy }}</small>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No spaces available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
