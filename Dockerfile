@@ -32,6 +32,7 @@ COPY --from=builder /root/.local /home/appuser/.local
 # Copy application code
 COPY app.py ./
 COPY templates ./templates
+COPY data ./data
 
 # Make sure scripts in .local are usable
 ENV PATH=/home/appuser/.local/bin:$PATH

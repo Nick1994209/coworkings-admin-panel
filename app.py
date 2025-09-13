@@ -1,8 +1,8 @@
 import json
 import os
+import pathlib
 from datetime import datetime
 from functools import wraps
-import pathlib
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 
@@ -97,8 +97,8 @@ def logout():
 def spaces():
     data = load_data()
     return render_template("spaces.html", spaces=data["coworking_spaces"])
-    
-    
+
+
 @app.route("/meeting_rooms")
 @admin_required
 def meeting_rooms():
@@ -115,13 +115,20 @@ def space_detail(space_id):
         return redirect(url_for("spaces"))
 
     space = data["coworking_spaces"][space_id]
-    
+
     # Get registrations for this space
-    space_registrations = [reg for reg in data["registrations"] if reg["space_id"] == space_id]
-    
-    return render_template("space_detail.html", space=space, space_id=space_id, registrations=space_registrations)
-    
-    
+    space_registrations = [
+        reg for reg in data["registrations"] if reg["space_id"] == space_id
+    ]
+
+    return render_template(
+        "space_detail.html",
+        space=space,
+        space_id=space_id,
+        registrations=space_registrations,
+    )
+
+
 @app.route("/meeting_room/<room_id>")
 @admin_required
 def meeting_room_detail(room_id):
@@ -129,9 +136,9 @@ def meeting_room_detail(room_id):
     if room_id not in data["meeting_rooms"]:
         flash("Meeting room not found")
         return redirect(url_for("meeting_rooms"))
-        
+
     room = data["meeting_rooms"][room_id]
-    
+
     # Get registrations for this meeting room (we'll need to modify the registration model to support this)
     # For now, we'll just show the room details
     return render_template("meeting_room_detail.html", room=room, room_id=room_id)
@@ -153,7 +160,7 @@ def add_space():
         # Initialize seat layout
         seat_layout = []
         seats = {}
-        
+
         # Create a grid layout for seats
         for r in range(rows):
             row = []
@@ -163,10 +170,10 @@ def add_space():
                 # Initialize each seat as available
                 seats[seat_id] = {
                     "id": seat_id,
-                    "row": r+1,
-                    "col": c+1,
+                    "row": r + 1,
+                    "col": c + 1,
                     "available": True,
-                    "reserved_by": None
+                    "reserved_by": None,
                 }
             seat_layout.append(row)
 
@@ -177,7 +184,7 @@ def add_space():
             "current_occupancy": 0,
             "equipment": [],
             "seat_layout": seat_layout,
-            "seats": seats
+            "seats": seats,
         }
 
         save_data(data)
@@ -185,8 +192,8 @@ def add_space():
         return redirect(url_for("spaces"))
 
     return render_template("add_space.html")
-    
-    
+
+
 @app.route("/add_meeting_room", methods=["GET", "POST"])
 @admin_required
 def add_meeting_room():
@@ -194,24 +201,24 @@ def add_meeting_room():
         name = request.form["name"]
         location = request.form["location"]
         capacity = int(request.form["capacity"])
-        
+
         data = load_data()
         new_id = str(len(data["meeting_rooms"]) + 1)
-        
+
         data["meeting_rooms"][new_id] = {
             "name": name,
             "location": location,
             "capacity": capacity,
             "current_occupancy": 0,
         }
-        
+
         save_data(data)
         flash("Meeting room added successfully")
         return redirect(url_for("meeting_rooms"))
-        
+
     return render_template("add_meeting_room.html")
-    
-    
+
+
 @app.route("/edit_meeting_room/<room_id>", methods=["GET", "POST"])
 @admin_required
 def edit_meeting_room(room_id):
@@ -219,7 +226,7 @@ def edit_meeting_room(room_id):
     if room_id not in data["meeting_rooms"]:
         flash("Meeting room not found")
         return redirect(url_for("meeting_rooms"))
-        
+
     if request.method == "POST":
         data["meeting_rooms"][room_id]["name"] = request.form["name"]
         data["meeting_rooms"][room_id]["location"] = request.form["location"]
@@ -227,7 +234,7 @@ def edit_meeting_room(room_id):
         save_data(data)
         flash("Meeting room updated successfully")
         return redirect(url_for("meeting_room_detail", room_id=room_id))
-        
+
     room = data["meeting_rooms"][room_id]
     return render_template("edit_meeting_room.html", room=room, room_id=room_id)
 
@@ -336,7 +343,7 @@ def submit_registration():
     # Check if it's a coworking space or meeting room
     space_name = ""
     is_meeting_room = False
-    
+
     if space_id.startswith("mr_"):
         # It's a meeting room (mr_ prefix)
         is_meeting_room = True
@@ -351,7 +358,7 @@ def submit_registration():
             flash("Invalid space selected")
             return redirect(url_for("registration_form"))
         space_name = data["coworking_spaces"][space_id]["name"]
-    
+
     # Create registration record
     registration = {
         "id": len(data["registrations"]) + 1,
@@ -366,34 +373,42 @@ def submit_registration():
         "start_date": start_date,
         "additional_info": additional_info,
         "submitted_at": datetime.now().isoformat(),
-        "is_meeting_room": is_meeting_room
+        "is_meeting_room": is_meeting_room,
     }
-    
+
     # Handle seat selection for coworking spaces
     if not is_meeting_room:
         selected_seat = request.form.get("selectedSeat")
         if selected_seat:
             # Validate that the seat exists and is available
-            if (selected_seat in data["coworking_spaces"][space_id]["seats"] and
-                data["coworking_spaces"][space_id]["seats"][selected_seat]["available"]):
+            if (
+                selected_seat in data["coworking_spaces"][space_id]["seats"]
+                and data["coworking_spaces"][space_id]["seats"][selected_seat][
+                    "available"
+                ]
+            ):
                 # Reserve the seat
-                data["coworking_spaces"][space_id]["seats"][selected_seat]["available"] = False
-                data["coworking_spaces"][space_id]["seats"][selected_seat]["reserved_by"] = f"{first_name} {last_name}"
+                data["coworking_spaces"][space_id]["seats"][selected_seat][
+                    "available"
+                ] = False
+                data["coworking_spaces"][space_id]["seats"][selected_seat][
+                    "reserved_by"
+                ] = f"{first_name} {last_name}"
                 registration["selected_seat"] = selected_seat
             else:
                 flash("Selected seat is not available")
                 return redirect(url_for("registration_form"))
-    
+
     # Add to registrations
     data["registrations"].append(registration)
-    
+
     # Update current occupancy for the space
     if is_meeting_room:
         room_id = space_id[3:]  # Remove "mr_" prefix
         data["meeting_rooms"][room_id]["current_occupancy"] += 1
     else:
         data["coworking_spaces"][space_id]["current_occupancy"] += 1
-    
+
     # Save data
     save_data(data)
 
@@ -419,16 +434,16 @@ def api_meeting_rooms_count():
 @admin_required
 def api_seats(space_id):
     data = load_data()
-    
+
     if space_id not in data["coworking_spaces"]:
         return {"error": "Space not found"}, 404
-    
+
     space = data["coworking_spaces"][space_id]
-    
+
     # Return seat layout and seat information
     return {
         "seat_layout": space.get("seat_layout", []),
-        "seats": space.get("seats", {})
+        "seats": space.get("seats", {}),
     }
 
 

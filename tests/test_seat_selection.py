@@ -25,40 +25,37 @@ def client():
                 "capacity": 4,
                 "current_occupancy": 0,
                 "equipment": [],
-                "seat_layout": [
-                    ["1-1", "1-2"],
-                    ["2-1", "2-2"]
-                ],
+                "seat_layout": [["1-1", "1-2"], ["2-1", "2-2"]],
                 "seats": {
                     "1-1": {
                         "id": "1-1",
                         "row": 1,
                         "col": 1,
                         "available": True,
-                        "reserved_by": None
+                        "reserved_by": None,
                     },
                     "1-2": {
                         "id": "1-2",
                         "row": 1,
                         "col": 2,
                         "available": True,
-                        "reserved_by": None
+                        "reserved_by": None,
                     },
                     "2-1": {
                         "id": "2-1",
                         "row": 2,
                         "col": 1,
                         "available": True,
-                        "reserved_by": None
+                        "reserved_by": None,
                     },
                     "2-2": {
                         "id": "2-2",
                         "row": 2,
                         "col": 2,
                         "available": True,
-                        "reserved_by": None
-                    }
-                }
+                        "reserved_by": None,
+                    },
+                },
             }
         },
         "meeting_rooms": {},
@@ -96,7 +93,9 @@ def authenticated_client(client):
 def test_space_detail_page_with_seat_map(authenticated_client):
     """Test that the space detail page shows seat map"""
     rv = authenticated_client.get("/space/1")
-    assert "Никита Корольков".encode('utf-8') in rv.data  # Using the actual space name from data.json
+    assert (
+        "Никита Корольков".encode("utf-8") in rv.data
+    )  # Using the actual space name from data.json
     assert b"Seat Map" in rv.data
     assert b"seat-available" in rv.data
     assert b"seat-occupied" in rv.data
@@ -121,7 +120,7 @@ def test_add_space_with_seat_layout(authenticated_client):
             location="New Location",
             capacity=6,
             rows=2,
-            cols=3
+            cols=3,
         ),
         follow_redirects=True,
     )
@@ -137,10 +136,10 @@ def test_add_space_with_seat_layout(authenticated_client):
 def test_api_seats_endpoint(authenticated_client):
     """Test the API endpoint for getting seat data"""
     rv = authenticated_client.get("/api/seats/1")
-    
+
     # Parse JSON response
     response_data = json.loads(rv.data.decode("utf-8"))
-    
+
     assert "seat_layout" in response_data
     assert "seats" in response_data
     assert len(response_data["seat_layout"]) == 5  # 5 rows
@@ -154,7 +153,7 @@ def test_api_seats_endpoint(authenticated_client):
 def test_api_seats_endpoint_invalid_space(authenticated_client):
     """Test the API endpoint with invalid space ID"""
     rv = authenticated_client.get("/api/seats/999")
-    
+
     # Should return error
     response_data = json.loads(rv.data.decode("utf-8"))
     assert "error" in response_data
@@ -179,7 +178,7 @@ def test_submit_registration_with_seat_selection(authenticated_client):
             location="Test Location",
             capacity=4,
             rows=2,
-            cols=2
+            cols=2,
         ),
         follow_redirects=True,
     )
@@ -198,7 +197,7 @@ def test_submit_registration_with_seat_selection(authenticated_client):
             membershipType="monthly",
             startDate="2025-10-01",
             additionalInfo="Testing seat selection",
-            selectedSeat="1-1"  # Select seat 1-1
+            selectedSeat="1-1",  # Select seat 1-1
         ),
         follow_redirects=True,
     )
@@ -221,7 +220,7 @@ def test_submit_registration_with_occupied_seat(authenticated_client):
             location="Test Location",
             capacity=4,
             rows=2,
-            cols=2
+            cols=2,
         ),
         follow_redirects=True,
     )
@@ -240,7 +239,7 @@ def test_submit_registration_with_occupied_seat(authenticated_client):
             membershipType="monthly",
             startDate="2025-10-01",
             additionalInfo="First registration",
-            selectedSeat="1-1"
+            selectedSeat="1-1",
         ),
         follow_redirects=True,
     )
@@ -259,7 +258,7 @@ def test_submit_registration_with_occupied_seat(authenticated_client):
             membershipType="monthly",
             startDate="2025-10-01",
             additionalInfo="Second registration attempt",
-            selectedSeat="1-1"  # Same seat
+            selectedSeat="1-1",  # Same seat
         ),
         follow_redirects=True,
     )
@@ -282,7 +281,7 @@ def test_submit_registration_with_invalid_seat(authenticated_client):
             membershipType="monthly",
             startDate="2025-10-01",
             additionalInfo="Testing invalid seat",
-            selectedSeat="99-99"  # Invalid seat ID
+            selectedSeat="99-99",  # Invalid seat ID
         ),
         follow_redirects=True,
     )
@@ -301,7 +300,7 @@ def test_seat_reservation_persistence(authenticated_client):
             location="Test Location",
             capacity=4,
             rows=2,
-            cols=2
+            cols=2,
         ),
         follow_redirects=True,
     )
@@ -320,7 +319,7 @@ def test_seat_reservation_persistence(authenticated_client):
             membershipType="monthly",
             startDate="2025-10-01",
             additionalInfo="Testing persistence",
-            selectedSeat="2-2"
+            selectedSeat="2-2",
         ),
         follow_redirects=True,
     )
@@ -342,11 +341,7 @@ def test_meeting_room_seat_selection_hidden(authenticated_client):
     # First add a meeting room
     rv = authenticated_client.post(
         "/add_meeting_room",
-        data=dict(
-            name="Test Meeting Room",
-            location="Test Location",
-            capacity=10
-        ),
+        data=dict(name="Test Meeting Room", location="Test Location", capacity=10),
         follow_redirects=True,
     )
     assert b"Meeting room added successfully" in rv.data
@@ -356,4 +351,6 @@ def test_meeting_room_seat_selection_hidden(authenticated_client):
     assert b"mr_1" in rv.data  # Meeting room should be in the list
 
     # The seat selection should work correctly (hidden for meeting rooms)
-    assert b"Select Seat" in rv.data  # The section exists but should be hidden via JavaScript
+    assert (
+        b"Select Seat" in rv.data
+    )  # The section exists but should be hidden via JavaScript

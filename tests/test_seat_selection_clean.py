@@ -60,7 +60,7 @@ def test_add_space_with_seat_layout(clean_authenticated_client):
             location="New Location",
             capacity=6,
             rows=2,
-            cols=3
+            cols=3,
         ),
         follow_redirects=True,
     )
@@ -83,7 +83,7 @@ def test_submit_registration_with_seat_selection(clean_authenticated_client):
             location="Test Location",
             capacity=4,
             rows=2,
-            cols=2
+            cols=2,
         ),
         follow_redirects=True,
     )
@@ -102,7 +102,7 @@ def test_submit_registration_with_seat_selection(clean_authenticated_client):
             membershipType="monthly",
             startDate="2025-10-01",
             additionalInfo="Testing seat selection",
-            selectedSeat="1-1"  # Select seat 1-1
+            selectedSeat="1-1",  # Select seat 1-1
         ),
         follow_redirects=True,
     )
@@ -125,7 +125,7 @@ def test_submit_registration_with_occupied_seat(clean_authenticated_client):
             location="Test Location",
             capacity=4,
             rows=2,
-            cols=2
+            cols=2,
         ),
         follow_redirects=True,
     )
@@ -144,7 +144,7 @@ def test_submit_registration_with_occupied_seat(clean_authenticated_client):
             membershipType="monthly",
             startDate="2025-10-01",
             additionalInfo="First registration",
-            selectedSeat="1-1"
+            selectedSeat="1-1",
         ),
         follow_redirects=True,
     )
@@ -163,7 +163,7 @@ def test_submit_registration_with_occupied_seat(clean_authenticated_client):
             membershipType="monthly",
             startDate="2025-10-01",
             additionalInfo="Second registration attempt",
-            selectedSeat="1-1"  # Same seat
+            selectedSeat="1-1",  # Same seat
         ),
         follow_redirects=True,
     )
@@ -182,7 +182,7 @@ def test_seat_reservation_persistence(clean_authenticated_client):
             location="Test Location",
             capacity=4,
             rows=2,
-            cols=2
+            cols=2,
         ),
         follow_redirects=True,
     )
@@ -201,7 +201,7 @@ def test_seat_reservation_persistence(clean_authenticated_client):
             membershipType="monthly",
             startDate="2025-10-01",
             additionalInfo="Testing persistence",
-            selectedSeat="2-2"
+            selectedSeat="2-2",
         ),
         follow_redirects=True,
     )
