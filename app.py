@@ -2,6 +2,7 @@ import json
 import os
 from datetime import datetime
 from functools import wraps
+import pathlib
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 
@@ -9,7 +10,9 @@ app = Flask(__name__)
 app.secret_key = "your-secret-key-change-in-production"
 
 # Local data storage
-DATA_FILE = os.environ.get("DATA_FILE", "data.json")
+DATA_DIRECTORY = pathlib.Path(os.environ.get("DATA_DIRECTORY", "data"))
+DATA_FILE = DATA_DIRECTORY / "data.json"
+os.makedirs(DATA_DIRECTORY, exist_ok=True)
 
 
 # Initialize data file if it doesn't exist

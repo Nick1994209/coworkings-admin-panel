@@ -1,5 +1,5 @@
 # Multi-stage build for minimal image size
-FROM python:3.11-alpine AS builder
+FROM python:3.11-alpine3.20 AS builder
 
 # Install build dependencies
 RUN apk add --no-cache gcc musl-dev linux-headers
@@ -14,7 +14,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
 # Final stage - minimal image
-FROM python:3.11-alpine
+FROM python:3.11-alpine3.20
+
+# Labels for better image identification
+LABEL maintainer="korolkov"
+LABEL description="Coworking Space Admin Panel"
 
 # Create non-root user
 RUN adduser -D appuser
@@ -38,6 +42,10 @@ USER appuser
 
 # Expose port
 EXPOSE 5000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:5000/login || exit 1
 
 # Run the application
 ENTRYPOINT ["python"]
