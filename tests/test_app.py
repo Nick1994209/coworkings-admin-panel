@@ -236,7 +236,7 @@ def test_registration_submission(authenticated_client):
     import re
 
     match = re.search(
-        r'<option value="(\d+)">Registration Test Space \(Registration Test Location\)</option>',
+        r'<option value="(\d+)">Registration Test Space \(Coworking Space - Registration Test Location\)</option>',
         rv.data.decode("utf-8"),
     )
     assert match, "Could not find space ID in registration form page"

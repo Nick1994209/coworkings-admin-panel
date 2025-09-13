@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Add Meeting Room - Coworking Admin Panel{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>Add New Meeting Room</h1>
+            <a href="{{ url_for('meeting_rooms') }}" class="btn btn-secondary">Back to Meeting Rooms</a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Room Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="capacity" class="form-label">Capacity</label>
+                        <input type="number" class="form-control" id="capacity" name="capacity" min="1" value="1" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Add Meeting Room</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Instructions</h5>
+            </div>
+            <div class="card-body">
+                <p>Fill in the form to add a new meeting room to your coworking space.</p>
+                <p>Meeting rooms can be booked by users through the registration form.</p>
+                <ul>
+                    <li><strong>Room Name</strong>: A descriptive name for the meeting room</li>
+                    <li><strong>Location</strong>: Physical location of the meeting room</li>
+                    <li><strong>Capacity</strong>: Maximum number of people the room can accommodate</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

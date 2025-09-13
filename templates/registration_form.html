@@ -48,11 +48,15 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="space" class="form-label">Preferred Coworking Space</label>
+                        <label for="space" class="form-label">Preferred Space</label>
                         <select class="form-select" id="space" name="space" required>
                             <option value="">Select a space</option>
                             {% for space_id, space in spaces.items() %}
-                            <option value="{{ space_id }}">{{ space.name }} ({{ space.location }})</option>
+                                {% if space_id.startswith('mr_') %}
+                                    <option value="{{ space_id }}">{{ space.name }} (Meeting Room - {{ space.location }})</option>
+                                {% else %}
+                                    <option value="{{ space_id }}">{{ space.name }} (Coworking Space - {{ space.location }})</option>
+                                {% endif %}
                             {% endfor %}
                             {% if not spaces %}
                             <option value="">No spaces available</option>
@@ -99,7 +103,7 @@
                 <h5>Form Instructions</h5>
             </div>
             <div class="card-body">
-                <p>Users can fill out this form to request a spot at one of your coworking spaces.</p>
+                <p>Users can fill out this form to request a spot at one of your coworking spaces or book a meeting room.</p>
                 <p>As an administrator, you can:</p>
                 <ul>
                     <li>Review submitted forms</li>
@@ -121,7 +125,13 @@
                     {% for space_id, space in spaces.items() %}
                     <li class="list-group-item">
                         <strong>{{ space.name }}</strong><br>
-                        <small>{{ space.location }}</small><br>
+                        <small>
+                            {% if space_id.startswith('mr_') %}
+                                Meeting Room - {{ space.location }}
+                            {% else %}
+                                Coworking Space - {{ space.location }}
+                            {% endif %}
+                        </small><br>
                         <small>Capacity: {{ space.capacity }} | Current: {{ space.current_occupancy }}</small>
                     </li>
                     {% endfor %}

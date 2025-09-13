@@ -89,7 +89,7 @@ def test_submit_registration_success(authenticated_client):
     import re
 
     match = re.search(
-        r'<option value="(\d+)">Registration Test Space \(Registration Test Location\)</option>',
+        r'<option value="(\d+)">Registration Test Space \(Coworking Space - Registration Test Location\)</option>',
         rv.data.decode("utf-8"),
     )
     assert match, "Could not find space ID in registration form page"
@@ -170,7 +170,7 @@ def test_registrations_page_with_data(authenticated_client):
     import re
 
     match = re.search(
-        r'<option value="(\d+)">Registration Test Space 2 \(Registration Test Location 2\)</option>',
+        r'<option value="(\d+)">Registration Test Space 2 \(Coworking Space - Registration Test Location 2\)</option>',
         rv.data.decode("utf-8"),
     )
     assert match, "Could not find space ID in registration form page"

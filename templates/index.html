@@ -30,6 +30,16 @@
             </div>
         </div>
     </div>
+    
+    <div class="col-md-6 mt-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Meeting Rooms</h5>
+                <p class="card-text">View, add, edit, and delete meeting rooms.</p>
+                <a href="{{ url_for('meeting_rooms') }}" class="btn btn-primary">Go to Meeting Rooms</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row mt-4">
@@ -39,24 +49,36 @@
                 <h5>Quick Stats</h5>
             </div>
             <div class="card-body">
-                {% if spaces %}
-                    <p>Total Spaces: {{ spaces|length }}</p>
-                    <p>Overall Occupancy: 
-                        {% set total_capacity = 0 %}
-                        {% set total_occupancy = 0 %}
-                        {% for space in spaces.values() %}
-                            {% set total_capacity = total_capacity + space.capacity %}
-                            {% set total_occupancy = total_occupancy + space.current_occupancy %}
-                        {% endfor %}
-                        {% if total_capacity > 0 %}
-                            {{ "%.1f"|format((total_occupancy / total_capacity * 100)) }}%
-                        {% else %}
-                            0%
-                        {% endif %}
-                    </p>
-                {% else %}
-                    <p>No spaces available. <a href="{{ url_for('add_space') }}">Add your first space</a>.</p>
-                {% endif %}
+                {% set total_spaces = spaces|length %}
+                {% set total_capacity = 0 %}
+                {% set total_occupancy = 0 %}
+                {% for space in spaces.values() %}
+                    {% set total_capacity = total_capacity + space.capacity %}
+                    {% set total_occupancy = total_occupancy + space.current_occupancy %}
+                {% endfor %}
+                
+                <p>Total Coworking Spaces: {{ total_spaces }}</p>
+                <p>Total Meeting Rooms: <span id="total-meeting-rooms">Loading...</span></p>
+                <p>Overall Occupancy:
+                    {% if total_capacity > 0 %}
+                        {{ "%.1f"|format((total_occupancy / total_capacity * 100)) }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </p>
+                
+                <script>
+                    // Fetch meeting rooms count via AJAX
+                    fetch('/api/meeting_rooms_count')
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('total-meeting-rooms').textContent = data.count;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching meeting rooms count:', error);
+                            document.getElementById('total-meeting-rooms').textContent = 'Error';
+                        });
+                </script>
             </div>
         </div>
     </div>

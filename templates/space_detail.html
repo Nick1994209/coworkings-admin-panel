@@ -101,6 +101,54 @@
     </div>
 </div>
 
+<div class="row mt-4">
+   <div class="col-12">
+       <div class="card">
+           <div class="card-header">
+               <h5>Registrations for {{ space.name }}</h5>
+           </div>
+           <div class="card-body">
+               {% if registrations %}
+               <div class="table-responsive">
+                   <table class="table table-striped">
+                       <thead>
+                           <tr>
+                               <th>Name</th>
+                               <th>Email</th>
+                               <th>Membership</th>
+                               <th>Start Date</th>
+                               <th>Submitted</th>
+                           </tr>
+                       </thead>
+                       <tbody>
+                           {% for reg in registrations | reverse %}
+                           <tr>
+                               <td>{{ reg.first_name }} {{ reg.last_name }}</td>
+                               <td>{{ reg.email }}</td>
+                               <td>
+                                   {% if reg.membership_type == 'daily' %}
+                                       Daily Pass
+                                   {% elif reg.membership_type == 'monthly' %}
+                                       Monthly Membership
+                                   {% elif reg.membership_type == 'annual' %}
+                                       Annual Membership
+                                   {% endif %}
+                               </td>
+                               <td>{{ reg.start_date }}</td>
+                               <td>{{ reg.submitted_at.split('T')[0] }}</td>
+                           </tr>
+                           {% endfor %}
+                       </tbody>
+                   </table>
+               </div>
+               {% else %}
+               <p>No registrations for this space yet.</p>
+               {% endif %}
+           </div>
+       </div>
+   </div>
+</div>
+
 <!-- Add Equipment Modal -->
 <div class="modal fade" id="addEquipmentModal" tabindex="-1" aria-labelledby="addEquipmentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
