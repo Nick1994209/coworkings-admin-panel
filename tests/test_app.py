@@ -119,10 +119,10 @@ def test_logout(authenticated_client):
 
 def test_space_operations(authenticated_client):
     """Test adding, viewing, editing, and deleting a space"""
-    # Add a space
+    # Add a space with seat layout
     rv = authenticated_client.post(
         "/add_space",
-        data=dict(name="Test Space", location="Test Location", capacity=50),
+        data=dict(name="Test Space", location="Test Location", capacity=50, rows=5, cols=10),
         follow_redirects=True,
     )
 
@@ -188,7 +188,7 @@ def test_add_space(authenticated_client):
     """Test adding a new space"""
     rv = authenticated_client.post(
         "/add_space",
-        data=dict(name="New Space", location="New Location", capacity=100),
+        data=dict(name="New Space", location="New Location", capacity=100, rows=4, cols=5),
         follow_redirects=True,
     )
 
@@ -204,7 +204,7 @@ def test_delete_space(authenticated_client):
     # First add a space to delete
     rv = authenticated_client.post(
         "/add_space",
-        data=dict(name="Space to Delete", location="Delete Location", capacity=50),
+        data=dict(name="Space to Delete", location="Delete Location", capacity=50, rows=3, cols=3),
         follow_redirects=True,
     )
 
@@ -225,6 +225,8 @@ def test_registration_submission(authenticated_client):
             name="Registration Test Space",
             location="Registration Test Location",
             capacity=20,
+            rows=2,
+            cols=10,
         ),
         follow_redirects=True,
     )

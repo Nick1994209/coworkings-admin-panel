@@ -27,6 +27,7 @@
                                 <th>Membership</th>
                                 <th>Start Date</th>
                                 <th>Submitted</th>
+                                <th>Seat</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -46,6 +47,11 @@
                                 </td>
                                 <td>{{ reg.start_date }}</td>
                                 <td>{{ reg.submitted_at.split('T')[0] }}</td>
+                                {% if reg.selected_seat %}
+                                <td>{{ reg.selected_seat }}</td>
+                                {% else %}
+                                <td>-</td>
+                                {% endif %}
                             </tr>
                             {% endfor %}
                         </tbody>

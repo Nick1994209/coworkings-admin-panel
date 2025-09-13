@@ -77,6 +77,8 @@ def test_submit_registration_success(authenticated_client):
             name="Registration Test Space",
             location="Registration Test Location",
             capacity=20,
+            rows=4,
+            cols=5,
         ),
         follow_redirects=True,
     )
@@ -159,6 +161,8 @@ def test_registrations_page_with_data(authenticated_client):
             name="Registration Test Space 2",
             location="Registration Test Location 2",
             capacity=25,
+            rows=5,
+            cols=5,
         ),
         follow_redirects=True,
     )

@@ -64,6 +64,14 @@
                         </select>
                     </div>
                     
+                    <div class="mb-3" id="seat-selection-section" style="display: none;">
+                        <label class="form-label">Select Seat</label>
+                        <div id="seat-map-registration" class="seat-map-container mb-3 p-3 bg-light rounded">
+                            <!-- Seat map will be loaded here based on selected space -->
+                        </div>
+                        <input type="hidden" id="selectedSeat" name="selectedSeat">
+                    </div>
+                    
                     <div class="mb-3">
                         <label for="membershipType" class="form-label">Membership Type</label>
                         <select class="form-select" id="membershipType" name="membershipType" required>
@@ -143,4 +151,153 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Handle space selection to show seat map
+    document.getElementById('space').addEventListener('change', function() {
+        const spaceId = this.value;
+        const seatSection = document.getElementById('seat-selection-section');
+        const seatMapContainer = document.getElementById('seat-map-registration');
+        const selectedSeatInput = document.getElementById('selectedSeat');
+        
+        if (!spaceId || spaceId.startsWith('mr_')) {
+            // Hide seat selection for meeting rooms or when no space is selected
+            seatSection.style.display = 'none';
+            selectedSeatInput.value = '';
+            return;
+        }
+        
+        // Fetch seat data from the server
+        fetch(`/api/seats/${spaceId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    seatMapContainer.innerHTML = '<p>Error loading seat map.</p>';
+                    return;
+                }
+                
+                // Render the seat map
+                renderSeatMap(data, seatMapContainer, selectedSeatInput);
+                seatSection.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error fetching seat data:', error);
+                seatMapContainer.innerHTML = '<p>Error loading seat map.</p>';
+                seatSection.style.display = 'block';
+            });
+    });
+    
+    // Function to render seat map
+    function renderSeatMap(seatData, container, selectedSeatInput) {
+        if (!seatData.seat_layout || !seatData.seats) {
+            container.innerHTML = '<p>No seat layout configured for this space.</p>';
+            return;
+        }
+        
+        let seatMapHTML = '<div class="seat-map-inner">';
+        
+        // Generate seat map
+        seatData.seat_layout.forEach((row, rowIndex) => {
+            seatMapHTML += '<div class="seat-row d-flex justify-content-center">';
+            row.forEach((seatId, colIndex) => {
+                const seat = seatData.seats[seatId];
+                if (seat) {
+                    const seatClass = seat.available ? 'seat-available' : 'seat-occupied';
+                    const seatDisabled = seat.available ? '' : 'disabled';
+                    seatMapHTML += `
+                        <div class="seat m-1 ${seatClass} ${seatDisabled}"
+                             data-seat-id="${seatId}"
+                             title="Seat ${seatId}${seat.available ? '' : ' - Occupied'}">
+                            ${seatId.split('-')[1]}
+                        </div>
+                    `;
+                }
+            });
+            seatMapHTML += '</div>';
+        });
+        
+        seatMapHTML += '</div>';
+        seatMapHTML += '<div class="seat-legend d-flex justify-content-center mt-3">';
+        seatMapHTML += '<div class="mx-2"><span class="seat seat-available d-inline-block"></span> Available</div>';
+        seatMapHTML += '<div class="mx-2"><span class="seat seat-occupied d-inline-block"></span> Occupied</div>';
+        seatMapHTML += '</div>';
+        
+        container.innerHTML = seatMapHTML;
+        
+        // Add click handlers for seat selection
+        container.querySelectorAll('.seat-available').forEach(seatElement => {
+            seatElement.addEventListener('click', function() {
+                // Remove selected class from all seats
+                container.querySelectorAll('.seat').forEach(seat => {
+                    seat.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked seat
+                this.classList.add('selected');
+                
+                // Update hidden input with selected seat ID
+                selectedSeatInput.value = this.getAttribute('data-seat-id');
+            });
+        });
+    }
+</script>
+
+<style>
+   .seat-map-inner {
+       background-color: #f8f9fa;
+       padding: 20px;
+       border-radius: 8px;
+   }
+   
+   .seat-row {
+       margin-bottom: 5px;
+   }
+   
+   .seat {
+       width: 40px;
+       height: 40px;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       border-radius: 4px;
+       font-weight: bold;
+       cursor: pointer;
+       transition: all 0.2s ease;
+       border: 2px solid #ddd;
+   }
+   
+   .seat-available {
+       background-color: #28a745;
+       color: white;
+       border-color: #28a745;
+   }
+   
+   .seat-available:hover {
+       background-color: #218838;
+       transform: scale(1.1);
+   }
+   
+   .seat-occupied {
+       background-color: #dc3545;
+       color: white;
+       border-color: #dc3545;
+       cursor: not-allowed;
+   }
+   
+   .seat.selected {
+       background-color: #007bff;
+       border-color: #0056b3;
+       transform: scale(1.1);
+   }
+   
+   .seat-legend .seat {
+       width: 20px;
+       height: 20px;
+       font-size: 10px;
+   }
+   
+   .seat.disabled {
+       opacity: 0.6;
+   }
+</style>
 {% endblock %}

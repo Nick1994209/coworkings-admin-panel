@@ -47,6 +47,42 @@
        </div>
    </div>
    
+   <div class="col-md-12 mt-4">
+       <div class="card">
+           <div class="card-header">
+               <h5>Seat Map</h5>
+           </div>
+           <div class="card-body">
+               <div id="seat-map" class="d-flex flex-column align-items-center">
+                   <!-- Seat map will be generated here -->
+                   {% if space.seat_layout %}
+                   <div class="seat-map-container mb-3">
+                       {% for row in space.seat_layout %}
+                       <div class="seat-row d-flex justify-content-center">
+                           {% for seat_id in row %}
+                               {% set seat = space.seats[seat_id] %}
+                               <div class="seat m-1
+                                   {% if seat.available %}seat-available{% else %}seat-occupied{% endif %}"
+                                   data-seat-id="{{ seat_id }}"
+                                   title="Seat {{ seat_id }}{% if not seat.available %} - Reserved{% endif %}">
+                                   {{ seat_id.split('-')[1] }}
+                               </div>
+                           {% endfor %}
+                       </div>
+                       {% endfor %}
+                   </div>
+                   <div class="seat-legend d-flex justify-content-center mt-3">
+                       <div class="mx-2"><span class="seat seat-available d-inline-block"></span> Available</div>
+                       <div class="mx-2"><span class="seat seat-occupied d-inline-block"></span> Occupied</div>
+                   </div>
+                   {% else %}
+                   <p>No seat layout configured for this space.</p>
+                   {% endif %}
+               </div>
+           </div>
+       </div>
+   </div>
+   
    <div class="col-md-6">
         <div class="card">
             <div class="card-header">
@@ -118,6 +154,7 @@
                                <th>Membership</th>
                                <th>Start Date</th>
                                <th>Submitted</th>
+                               <th>Seat</th>
                            </tr>
                        </thead>
                        <tbody>
@@ -136,6 +173,11 @@
                                </td>
                                <td>{{ reg.start_date }}</td>
                                <td>{{ reg.submitted_at.split('T')[0] }}</td>
+                               {% if reg.selected_seat %}
+                               <td>{{ reg.selected_seat }}</td>
+                               {% else %}
+                               <td>-</td>
+                               {% endif %}
                            </tr>
                            {% endfor %}
                        </tbody>
@@ -238,4 +280,53 @@
         placemark.balloon.open();
    });
 </script>
+
+<style>
+   .seat-map-container {
+       background-color: #f8f9fa;
+       padding: 20px;
+       border-radius: 8px;
+   }
+   
+   .seat-row {
+       margin-bottom: 5px;
+   }
+   
+   .seat {
+       width: 40px;
+       height: 40px;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       border-radius: 4px;
+       font-weight: bold;
+       cursor: pointer;
+       transition: all 0.2s ease;
+       border: 2px solid #ddd;
+   }
+   
+   .seat-available {
+       background-color: #28a745;
+       color: white;
+       border-color: #28a745;
+   }
+   
+   .seat-available:hover {
+       background-color: #218838;
+       transform: scale(1.1);
+   }
+   
+   .seat-occupied {
+       background-color: #dc3545;
+       color: white;
+       border-color: #dc3545;
+       cursor: not-allowed;
+   }
+   
+   .seat-legend .seat {
+       width: 20px;
+       height: 20px;
+       font-size: 10px;
+   }
+</style>
 {% endblock %}
